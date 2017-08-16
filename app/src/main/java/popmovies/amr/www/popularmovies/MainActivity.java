@@ -22,12 +22,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private static String SELECTED_TYPE = "Popular";
 
-    private TextView mErrorMessageDisplay;
+    private TextView errorMessageDisplay;
 
-    private ProgressBar mLoadingIndicator;
+    private ProgressBar loadingIndicator;
 
     private RecyclerView recyclerView;
-
     private MovieAdapter movieAdapter;
 
     private Context context;
@@ -38,9 +37,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mErrorMessageDisplay = (TextView) findViewById(R.id.error_message_display);
+        errorMessageDisplay = (TextView) findViewById(R.id.error_message_display);
 
-        mLoadingIndicator = (ProgressBar) findViewById(R.id.loading_indicator);
+        loadingIndicator = (ProgressBar) findViewById(R.id.loading_indicator);
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview_movies);
 
@@ -58,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
 
 
+
         loadMovies();
 
     }
@@ -70,14 +70,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     }
 
     private void showJsonDataView() {
-        mErrorMessageDisplay.setVisibility(View.INVISIBLE);
+        errorMessageDisplay.setVisibility(View.INVISIBLE);
         recyclerView.setVisibility(View.VISIBLE);
     }
 
 
     private void showErrorMessage() {
         recyclerView.setVisibility(View.INVISIBLE);
-        mErrorMessageDisplay.setVisibility(View.VISIBLE);
+        errorMessageDisplay.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -95,12 +95,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            loadingIndicator.setVisibility(View.VISIBLE);
         }
 
         @Override
         protected void onPostExecute(MovieObj[] movieObjs) {
             super.onPostExecute(movieObjs);
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
+            loadingIndicator.setVisibility(View.INVISIBLE);
             if (movieObjs != null) {
                 for (MovieObj movie : movieObjs){
                     Log.i("Main_Activiy",movie.toString());
