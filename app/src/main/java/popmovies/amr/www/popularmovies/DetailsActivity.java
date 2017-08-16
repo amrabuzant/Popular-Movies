@@ -7,29 +7,38 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 import com.squareup.picasso.Picasso;
 
 public class DetailsActivity extends AppCompatActivity {
 
     private MovieObj movie;
 
-    private TextView movieName;
-    private TextView movieReleaseDate;
-    private TextView movieRating;
-    private TextView moviePlot;
-    private ImageView moviePoster;
+    @BindView(R.id.movieName)
+     TextView movieName;
+    @BindView(R.id.MovieReleaseDate)
+     TextView movieReleaseDate;
+    @BindView(R.id.UserRating)
+     TextView movieRating;
+    @BindView(R.id.PlotText)
+     TextView moviePlot;
+    @BindView(R.id.MoviePoster)
+     ImageView moviePoster;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        movieName = (TextView) findViewById(R.id.movieName);
-        movieReleaseDate = (TextView) findViewById(R.id.MovieReleaseDate);
-        movieRating = (TextView) findViewById(R.id.UserRating);
-        moviePlot = (TextView) findViewById(R.id.PlotText);
-        moviePoster = (ImageView) findViewById(R.id.MoviePoster);
+//        movieName = (TextView) findViewById(R.id.movieName);
+//        movieReleaseDate = (TextView) findViewById(R.id.MovieReleaseDate);
+//        movieRating = (TextView) findViewById(R.id.UserRating);
+//        moviePlot = (TextView) findViewById(R.id.PlotText);
+//        moviePoster = (ImageView) findViewById(R.id.MoviePoster);
 
+        ButterKnife.bind(this);
 
         Intent intentThatStartedThisActivity = getIntent();
 
