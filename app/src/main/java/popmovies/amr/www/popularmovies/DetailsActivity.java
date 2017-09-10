@@ -1,7 +1,9 @@
 package popmovies.amr.www.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,8 +12,10 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,6 +40,8 @@ public class DetailsActivity extends AppCompatActivity {
      TextView moviePlot;
     @BindView(R.id.MoviePoster)
      ImageView moviePoster;
+    @BindView(R.id.markFav)
+    Button addToFav;
 
     @BindView(R.id.reviews_list)
      RecyclerView reviewsList;
@@ -68,6 +74,7 @@ public class DetailsActivity extends AppCompatActivity {
         trailersAdapter.setTrailerArray(trailers);
 
         trailersList.setAdapter(trailersAdapter);
+
 
         Intent intentThatStartedThisActivity = getIntent();
 
@@ -177,6 +184,22 @@ public class DetailsActivity extends AppCompatActivity {
                 e.printStackTrace();
                 return null;
             }
+        }
+    }
+
+    public void addMovieToFav(View view) {
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MoveContract.MovieEntry.COLUMN_MOVIE_ID, movie.id);
+        contentValues.put(MoveContract.MovieEntry.COLUMN_NAME, movie.originalTitle);
+        contentValues.put(MoveContract.MovieEntry.COLUMN_RELEASE_DATE, movie.releaseDate);
+        contentValues.put(MoveContract.MovieEntry.COLUMN_RATING, movie.userRating);
+        contentValues.put(MoveContract.MovieEntry.COLUMN_PLOT,movie.plot);
+        contentValues.put(MoveContract.MovieEntry.COLUMN_IMAGE_URL,movie.imageThumpAddr);
+
+        Uri uri = getContentResolver().insert(MoveContract.MovieEntry.CONTENT_URI, contentValues);
+        if (uri != null) {
+            Log.e("Details","Error in add");
         }
     }
     @Override

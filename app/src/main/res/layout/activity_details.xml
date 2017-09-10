@@ -96,7 +96,8 @@
             app:layout_constraintLeft_toLeftOf="@+id/MovieReleaseDate"
             app:layout_constraintRight_toRightOf="@+id/MovieReleaseDate"
             app:layout_constraintTop_toBottomOf="@+id/UserRating"
-            tools:text="Mark As Favorite" />
+            tools:text="Mark As Favorite"
+            android:onClick="addMovieToFav"/>
 
         <TextView
             android:id="@+id/view"

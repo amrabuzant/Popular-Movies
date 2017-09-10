@@ -2,6 +2,8 @@ package popmovies.amr.www.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
@@ -78,6 +80,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         showJsonDataView();
 
         new FetchMovies().execute(SELECTED_TYPE);
+
+    }
+
+    private void loadFav(){
+        showJsonDataView();
+
+        new FavouriteMoviesFetchTask().execute();
 
     }
 
@@ -165,7 +174,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             loadMovies();
             updateMenuTitles();
             return true;
+        }else if (id == R.id.favMovies){
+            movieAdapter.setMovieArray(null);
+            loadFav();
+            return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -181,6 +195,46 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         }
     }
 
+    public class FavouriteMoviesFetchTask extends AsyncTask<Void, Void, Void> {
+
+        MovieObj[] movies;
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            Uri uri = MoveContract.MovieEntry.CONTENT_URI;
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+
+            int count = cursor.getCount();
+            movies = new MovieObj[cursor.getCount()];
+            if (count == 0) {
+                return null;
+            }
+
+            if (cursor.moveToFirst()) {
+                do {
+                    String originalTitle = cursor.getString(cursor.getColumnIndex(MoveContract.MovieEntry.COLUMN_NAME));
+                    String imageThumpAddr = cursor.getString(cursor.getColumnIndex(MoveContract.MovieEntry.COLUMN_IMAGE_URL));
+                    String plot = cursor.getString(cursor.getColumnIndex(MoveContract.MovieEntry.COLUMN_PLOT));
+                    float userRating = cursor.getFloat(cursor.getColumnIndex(MoveContract.MovieEntry.COLUMN_RATING));
+                    String releaseDate =cursor.getString(cursor.getColumnIndex(MoveContract.MovieEntry.COLUMN_RELEASE_DATE));
+                    int movieID = cursor.getInt(cursor.getColumnIndex(MoveContract.MovieEntry.COLUMN_MOVIE_ID));
+                    movies[cursor.getPosition()] = new MovieObj(originalTitle,imageThumpAddr,plot,userRating,releaseDate,movieID);;
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            movieAdapter.setMovieArray(movies);
+            movieAdapter.notifyDataSetChanged();
+            showJsonDataView();
+        }
+    }
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         mListState = gridLayoutManager.onSaveInstanceState();
