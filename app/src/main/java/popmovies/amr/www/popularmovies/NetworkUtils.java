@@ -17,6 +17,8 @@ public final class NetworkUtils extends AppCompatActivity {
     private static final String TAG = NetworkUtils.class.getSimpleName();
 
     private static final String TOPRATED_API = "/movie/top_rated";
+    private static final String REVIEWS_API = "/reviews";
+    private static final String TRAILERS_API = "/videos";
     private static final String API_AUTH = "api_key";
 
     private static final String POPULAR_API =
@@ -40,6 +42,36 @@ public final class NetworkUtils extends AppCompatActivity {
 
             case "Popular":
                 builtUri = Uri.parse(MOVIEDB_BASE_URL+POPULAR_API).buildUpon()
+                        .appendQueryParameter(API_AUTH, authKey)
+                        .build();
+                break;
+
+            default:
+                return null;
+        }
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        Log.v(TAG, "Built URI " + url);
+        return url;
+    }
+
+    public static URL buildUrl(Context context,String APItoCall,String movieID) {
+        Uri builtUri;
+        String authKey = context.getString(R.string.AuthKey);
+        movieID = "/movie/" + movieID;
+        switch (APItoCall){
+            case "Reviews":
+                builtUri = Uri.parse(MOVIEDB_BASE_URL+movieID+REVIEWS_API).buildUpon()
+                        .appendQueryParameter(API_AUTH, authKey)
+                        .build();
+                break;
+
+            case "Trailers":
+                builtUri = Uri.parse(MOVIEDB_BASE_URL+movieID+TRAILERS_API).buildUpon()
                         .appendQueryParameter(API_AUTH, authKey)
                         .build();
                 break;

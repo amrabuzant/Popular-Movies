@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Popular Movies</string>
     <string name="error_msg">Error Displaying Data</string>
+    <string name="select_Favmovie">Mark As Favorite</string>
+    <string name="trailers">Trailers</string>
+    <string name="review">Reviews</string>
 </resources>

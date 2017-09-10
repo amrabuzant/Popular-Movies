@@ -3,6 +3,7 @@ package popmovies.amr.www.popularmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -24,6 +25,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private TextView errorMessageDisplay;
 
+    private GridLayoutManager gridLayoutManager;
+
     private ProgressBar loadingIndicator;
 
     private RecyclerView recyclerView;
@@ -32,6 +35,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private Context context;
 
     private Menu menu;
+    Parcelable mListState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,11 +50,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         context = this;
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this,2);
+        gridLayoutManager = new GridLayoutManager(this,2);
 
         recyclerView.setLayoutManager(gridLayoutManager);
 
-        recyclerView.setHasFixedSize(true);
 
         movieAdapter = new MovieAdapter(this);
 
@@ -57,8 +61,16 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
 
 
-
         loadMovies();
+
+        if (savedInstanceState != null){
+            mListState = savedInstanceState.getParcelable("position");
+            if (mListState != null) {
+                gridLayoutManager.onRestoreInstanceState(mListState);
+            }
+        }
+
+
 
     }
 
@@ -104,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             loadingIndicator.setVisibility(View.INVISIBLE);
             if (movieObjs != null) {
                 for (MovieObj movie : movieObjs){
-                    Log.i("Main_Activiy",movie.toString());
+//                    Log.i("Main_Activiy",movie.toString());
                 }
                 showJsonDataView();
                 movieAdapter.setMovieArray(movieObjs);
@@ -167,5 +179,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 menuItem.setTitle("Popular");
                 break;
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        mListState = gridLayoutManager.onSaveInstanceState();
+        outState.putParcelable("position", mListState);
+
+        super.onSaveInstanceState(outState);
     }
 }

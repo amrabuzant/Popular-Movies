@@ -14,14 +14,16 @@ public class MovieObj implements Parcelable {
     String plot;
     float userRating;
     String releaseDate;
+    int id;
 
-    public MovieObj(String name, String image, String story, float rate, String date)
+    public MovieObj(String name, String image, String story, float rate, String date,int id)
     {
         this.originalTitle = name;
         this.imageThumpAddr = image;
         this.plot = story;
         this.userRating = rate;
         this.releaseDate = date;
+        this.id = id;
     }
 
     protected MovieObj(Parcel in) {
@@ -30,6 +32,7 @@ public class MovieObj implements Parcelable {
         plot = in.readString();
         userRating = in.readFloat();
         releaseDate = in.readString();
+        id = in.readInt();
     }
 
     public static final Creator<MovieObj> CREATOR = new Creator<MovieObj>() {
@@ -46,7 +49,7 @@ public class MovieObj implements Parcelable {
 
     @Override
     public String toString() {
-        return "Movie Name:" + originalTitle;
+        return "Movie Name:" + originalTitle + ", ID = "+id ;
     }
 
     @Override
@@ -61,5 +64,6 @@ public class MovieObj implements Parcelable {
         parcel.writeString(plot);
         parcel.writeFloat(userRating);
         parcel.writeString(releaseDate);
+        parcel.writeInt(id);
     }
 }

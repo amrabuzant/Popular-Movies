@@ -31,8 +31,9 @@ public final class MovieDBJSONUtils {
             String plot = movieInfo.getString("overview");
             float userRating = (float) movieInfo.getDouble("vote_average");
             String releaseDate = movieInfo.getString("release_date");
+            int movieID = movieInfo.getInt("id");
 
-            parsedMovieData[i] = new MovieObj(originalTitle,imageThumpAddr,plot,userRating,releaseDate);
+            parsedMovieData[i] = new MovieObj(originalTitle,imageThumpAddr,plot,userRating,releaseDate,movieID);
 
         }
 
