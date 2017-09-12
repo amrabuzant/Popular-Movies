@@ -9,6 +9,7 @@ import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
@@ -36,8 +37,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private Context context;
 
+    private MovieObj [] movieArray;
     private Menu menu;
-    Parcelable mListState;
+    public final static String LIST_STATE_KEY = "recycler_list_state";
+    public final static String LIST_Object_KEY = "recycler_list_objects";
+    Parcelable listState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,10 +56,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         context = this;
 
-        gridLayoutManager = new GridLayoutManager(this,2);
+        gridLayoutManager = new GridLayoutManager(this, 2);
+        gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
-        recyclerView.setLayoutManager(gridLayoutManager);
-
+         recyclerView.setLayoutManager(gridLayoutManager);
 
         movieAdapter = new MovieAdapter(this);
 
@@ -63,23 +67,38 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
 
 
-        loadMovies();
 
         if (savedInstanceState != null){
-            mListState = savedInstanceState.getParcelable("position");
-            if (mListState != null) {
-                gridLayoutManager.onRestoreInstanceState(mListState);
+            listState = savedInstanceState.getParcelable(LIST_STATE_KEY);
+            if (listState != null) {
+                movieArray = (MovieObj[])savedInstanceState.getParcelableArray(LIST_Object_KEY);
+                movieAdapter.setMovieArray(movieArray);
+                gridLayoutManager.onRestoreInstanceState(listState);
             }
         }
 
+        loadMovies();
 
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (listState != null) {
+            Log.e("Scroll", listState.toString());
+            gridLayoutManager.onRestoreInstanceState(listState);
+        }
 
     }
 
     private void loadMovies(){
         showJsonDataView();
 
-        new FetchMovies().execute(SELECTED_TYPE);
+        if (movieArray == null){
+            new FetchMovies().execute(SELECTED_TYPE);
+        }
+
 
     }
 
@@ -124,10 +143,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             super.onPostExecute(movieObjs);
             loadingIndicator.setVisibility(View.INVISIBLE);
             if (movieObjs != null) {
-                for (MovieObj movie : movieObjs){
-//                    Log.i("Main_Activiy",movie.toString());
-                }
                 showJsonDataView();
+                movieArray = movieObjs;
                 movieAdapter.setMovieArray(movieObjs);
             } else {
                 showErrorMessage();
@@ -161,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu,menu);
         this.menu = menu;
+        updateMenuTitles();
         return true;
     }
 
@@ -169,13 +187,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         int id = item.getItemId();
 
         if (id == R.id.SortingType) {
-            SELECTED_TYPE = String.valueOf(item.getTitle());
+            SELECTED_TYPE = String.valueOf(item.getTitle()).replaceFirst("Show ","");
             movieAdapter.setMovieArray(null);
+            movieArray = null;
             loadMovies();
             updateMenuTitles();
             return true;
         }else if (id == R.id.favMovies){
             movieAdapter.setMovieArray(null);
+            movieArray = null;
             loadFav();
             return true;
         }
@@ -187,10 +207,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         MenuItem menuItem = menu.findItem(R.id.SortingType);
         switch (SELECTED_TYPE){
             case "Popular":
-                menuItem.setTitle("Top Rated");
+                menuItem.setTitle("Show Top Rated");
                 break;
             case "Top Rated":
-                menuItem.setTitle("Popular");
+                menuItem.setTitle("Show Popular");
                 break;
         }
     }
@@ -231,15 +251,30 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             super.onPostExecute(aVoid);
 
             movieAdapter.setMovieArray(movies);
-            movieAdapter.notifyDataSetChanged();
+            movieArray = movies;
             showJsonDataView();
         }
     }
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        mListState = gridLayoutManager.onSaveInstanceState();
-        outState.putParcelable("position", mListState);
 
+    protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+
+        listState = gridLayoutManager.onSaveInstanceState();
+
+        outState.putParcelable(LIST_STATE_KEY, listState);
+        outState.putParcelableArray(LIST_Object_KEY,movieArray);
+    }
+
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        movieArray = (MovieObj[])savedInstanceState.getParcelableArray(LIST_Object_KEY);
+        listState = savedInstanceState.getParcelable(LIST_STATE_KEY);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+//        listState = gridLayoutManager.onSaveInstanceState();
+//        Log.e("Scroll",listState.toString());
     }
 }
